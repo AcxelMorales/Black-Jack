@@ -14,8 +14,13 @@ let pointsPlayer = 0,
     pointsPC = 0;
 
 const btnPedir = document.getElementById('btnPedir');
+const btnDetener = document.getElementById('btnDetener');
+const btnNuevo = document.getElementById('btnNuevo');
+
 const smalls = document.querySelectorAll('small');
+
 const divJugador = document.getElementById('jugador-cartas');
+const divPC = document.getElementById('computadora-cartas');
 
 /**
  * Crea una nueva baraja
@@ -62,9 +67,31 @@ const valueLetter = letter => {
  * Turno de la PC
  */
 const pc = minPoints => {
-    // do {
+    do {
+        const letter = requestLetter()
+        pointsPC = pointsPC + valueLetter(letter);
+        smalls[1].innerHTML = pointsPC;
 
-    // } while ();
+        const imgLetter = document.createElement('img');
+        imgLetter.setAttribute('src', `assets/cartas/${letter}.png`);
+        imgLetter.classList.add('carta');
+
+        divPC.append(imgLetter);
+
+        if (minPoints > 21) break;
+    } while ((pointsPC < minPoints) && (minPoints <= 21));
+
+    setTimeout(() => {
+        if (pointsPC === minPoints) {
+            alert('Nadie Gana :(');
+        } else if (minPoints > 21) {
+            alert('Computadora Gana');
+        } else if (pointsPC > 21) {
+            alert('Jugador Gana');
+        } else {
+            alert('Computadora gana');
+        }
+    }, 5);
 };
 
 // ********************** EVENTS **********************
@@ -84,7 +111,32 @@ btnPedir.addEventListener('click', () => {
 
     if (pointsPlayer > 21) {
         btnPedir.disabled = true;
+        btnDetener.disabled = true;
+
+        pc(pointsPlayer);
     } else if (pointsPlayer === 21) {
         btnPedir.disabled = true;
+        btnDetener.disabled = true;
+        pc(pointsPlayer);
     }
+});
+
+btnDetener.addEventListener('click', () => {
+    btnPedir.disabled = true;
+    btnDetener.disabled = true;
+
+    pc(pointsPlayer);
+});
+
+btnNuevo.addEventListener('click', () => {
+    deck = createDeck();
+
+    pointsPlayer = 0;
+    pointsPC = 0;
+
+    smalls[0].innerHTML = 0;
+    smalls[1].innerHTML = 0;
+
+    divJugador.innerHTML = null;
+    divPC.innerHTML = null;
 });
