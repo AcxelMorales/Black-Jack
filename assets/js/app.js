@@ -139,4 +139,7 @@ btnNuevo.addEventListener('click', () => {
 
     divJugador.innerHTML = null;
     divPC.innerHTML = null;
+
+    btnPedir.disabled = false;
+    btnDetener.disabled = false;
 });
