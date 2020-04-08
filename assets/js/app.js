@@ -1,4 +1,10 @@
-(() => {
+/**
+ * @author Acxel Morales <https://acxelmorales.github.io/Acxel-Morales>
+ * @version 0.0.2
+ * @fileoverview Juego, BlackJack
+ */
+
+const myModule = (() => {
     'use strict';
 
     /**
@@ -8,25 +14,43 @@
      * 2S = Two of Spades
      */
     let deck = [];
-    const types = ['C', 'D', 'H', 'S'];
-    const specials = ['A', 'J', 'Q', 'K'];
+    const types = ['C', 'D', 'H', 'S'],
+        specials = ['A', 'J', 'Q', 'K'];
 
-    let pointsPlayer = 0,
-        pointsPC = 0;
+    let playersPoints = [];
 
-    const btnPedir = document.getElementById('btnPedir');
-    const btnDetener = document.getElementById('btnDetener');
-    const btnNuevo = document.getElementById('btnNuevo');
+    const btnPedir = document.getElementById('btnPedir'),
+        btnDetener = document.getElementById('btnDetener'),
+        btnNuevo = document.getElementById('btnNuevo');
 
-    const smalls = document.querySelectorAll('small');
+    const smalls = document.querySelectorAll('small'),
+        divLettersPlayer = document.querySelectorAll('.div-cartas');
 
-    const divJugador = document.getElementById('jugador-cartas');
-    const divPC = document.getElementById('computadora-cartas');
+    /**
+     * Inicializar la app
+     */
+    const initGame = (numPlayers = 2) => {
+        deck = createDeck();
+        playersPoints = [];
+
+        for (let i = 0; i < numPlayers; i++) {
+            playersPoints.push(0);
+        }
+
+        smalls.forEach(e => e.innerText = 0);
+        divLettersPlayer.forEach(e => e.innerHTML = null);
+
+        btnPedir.disabled = false;
+        btnDetener.disabled = false;
+    };
 
     /**
      * Crea una nueva baraja
+     * @return {[]}
      */
     const createDeck = () => {
+        deck = [];
+
         for (let i = 2; i <= 10; i++) {
             for (let t of types) {
                 deck.push(`${i}${t}`)
@@ -42,20 +66,19 @@
         return deck = _.shuffle(deck);
     };
 
-    deck = createDeck();
-
     /**
      * Tomar una carta
+     * @return {function}
      */
     const requestLetter = () => {
         if (deck.length === 0) throw new Error('No hay cartas en el deck');
-        const c = deck.pop();
-        return c;
+        return deck.pop();
     };
 
     /**
      * Valor de la carta
-     * @param {string}
+     * @param {string} letter
+     * @return {number}
      */
     const valueLetter = letter => {
         const value = letter.substring(0, letter.length - 1);
@@ -65,22 +88,36 @@
     };
 
     /**
-     * Turno de la PC
+     * Turno: 0 = primer jugador y el último será la pc
+     * @param {number} turn
+     * @param {string} letter
+     * @return {number}
      */
-    const pc = minPoints => {
-        do {
-            const letter = requestLetter()
-            pointsPC = pointsPC + valueLetter(letter);
-            smalls[1].innerHTML = pointsPC;
+    const accumulatePoints = (turn, letter) => {
+        playersPoints[turn] = playersPoints[turn] + valueLetter(letter);
+        smalls[turn].innerHTML = playersPoints[turn];
 
-            const imgLetter = document.createElement('img');
-            imgLetter.setAttribute('src', `assets/cartas/${letter}.png`);
-            imgLetter.classList.add('carta');
+        return playersPoints[turn];
+    };
 
-            divPC.append(imgLetter);
+    /**
+     * Crea una carta en el HTML
+     * @param {string} letter
+     * @param {number} turn
+     */
+    const createLetter = (letter, turn) => {
+        const imgLetter = document.createElement('img');
+        imgLetter.setAttribute('src', `assets/cartas/${letter}.png`);
+        imgLetter.classList.add('carta');
 
-            if (minPoints > 21) break;
-        } while ((pointsPC < minPoints) && (minPoints <= 21));
+        divLettersPlayer[turn].append(imgLetter);
+    };
+
+    /**
+     * Determina el ganador
+     */
+    const winer = () => {
+        const [minPoints, pointsPC] = playersPoints;
 
         setTimeout(() => {
             if (pointsPC === minPoints) {
@@ -92,7 +129,24 @@
             } else {
                 alert('Computadora gana');
             }
-        }, 5);
+        }, 100);
+    }
+
+    /**
+     * Turno de la PC
+     * @param {number} minPoints
+     */
+    const pc = minPoints => {
+        let pointsPC = 0;
+
+        do {
+            const letter = requestLetter();
+
+            pointsPC = accumulatePoints(playersPoints.length - 1, letter);
+            createLetter(letter, playersPoints.length - 1);
+        } while ((pointsPC < minPoints) && (minPoints <= 21));
+
+        winer(pointsPC, playersPoints.length - 1);
     };
 
     // ********************** EVENTS **********************
@@ -100,15 +154,10 @@
      * Pedir una carta
      */
     btnPedir.addEventListener('click', () => {
-        const letter = requestLetter()
-        pointsPlayer = pointsPlayer + valueLetter(letter);
-        smalls[0].innerHTML = pointsPlayer;
+        const letter = requestLetter();
+        const pointsPlayer = accumulatePoints(0, letter);
 
-        const imgLetter = document.createElement('img');
-        imgLetter.setAttribute('src', `assets/cartas/${letter}.png`);
-        imgLetter.classList.add('carta');
-
-        divJugador.append(imgLetter);
+        createLetter(letter, 0);
 
         if (pointsPlayer > 21) {
             btnPedir.disabled = true;
@@ -126,22 +175,12 @@
         btnPedir.disabled = true;
         btnDetener.disabled = true;
 
-        pc(pointsPlayer);
+        pc(playersPoints[0]);
     });
 
     btnNuevo.addEventListener('click', () => {
-        deck = createDeck();
-
-        pointsPlayer = 0;
-        pointsPC = 0;
-
-        smalls[0].innerHTML = 0;
-        smalls[1].innerHTML = 0;
-
-        divJugador.innerHTML = null;
-        divPC.innerHTML = null;
-
-        btnPedir.disabled = false;
-        btnDetener.disabled = false;
+        initGame();
     });
+
+    return { newGame: initGame };
 })();

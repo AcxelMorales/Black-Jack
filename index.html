@@ -20,22 +20,22 @@
         <div class="row mt-2">
             <div class="col text-center">
                 <button id="btnNuevo" class="btn btn-primary">Juego Nuevo</button>
-                <button id="btnPedir" class="btn btn-danger">Pedir Carta</button>
-                <button id="btnDetener" class="btn btn-warning">Detener</button>
+                <button id="btnPedir" disabled class="btn btn-danger">Pedir Carta</button>
+                <button id="btnDetener" disabled class="btn btn-warning">Detener</button>
             </div>
         </div>
 
         <div class="row container mt-3">
             <div class="col">
                 <h1>Jugador - <small>0 puntos</small> </h1>
-                <div id="jugador-cartas"></div>
+                <div id="jugador-cartas" class="div-cartas"></div>
             </div>
         </div>
 
         <div class="row container mt-3 mb-3">
             <div class="col">
                 <h1>Computadora - <small>0 puntos</small> </h1>
-                <div id="computadora-cartas"></div>
+                <div id="computadora-cartas" class="div-cartas"></div>
             </div>
         </div>
     </div>
@@ -50,7 +50,11 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
     <script src="https://underscorejs.org/underscore-min.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.min.js"></script>
+
+    <script>
+        myModule.newGame();
+    </script>
 </body>
 
 </html>
